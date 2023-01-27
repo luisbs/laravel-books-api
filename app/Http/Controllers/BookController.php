@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -36,11 +37,22 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Book  $book
+     * @param  string|int  $title
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Book $book)
+    public function destroy($title = '')
     {
+        $book = null;
+        if (is_numeric($title)) {
+            $book = Book::findOrFail($title);
+        } else if (is_string($title)) {
+            $book = Book::where('title', $title)->firstOrFail();
+        }
+
+        if (is_null($book)) {
+            throw (new ModelNotFoundException)->setModel(Book::class, $title);
+        }
+
         $book->delete();
         return BookResource::make($book);
     }

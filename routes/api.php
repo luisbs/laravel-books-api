@@ -20,4 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::resource('books', BookController::class)//
-    ->only('index', 'store', 'destroy');
+    ->only('index', 'store');
+Route::delete('books/{title}', [BookController::class, 'destroy']);
